@@ -1,0 +1,45 @@
+Starting ...
+Open serial port: 3
+Camera connected: 134-402
+Chip:
+   wafer:   134
+   ID:      402
+Identification:
+   device:  1024
+   version: 3
+Firmware:
+   major:   3
+   minor:   3
+Temperature         :   4611
+Camera distortion coefficient vector: 
+-0.397059 0.143377 0 0 0 0 0 0 
+Camera intrinsic matrix: 
+181.296 0 80 0 181.079 30 0 0 1 
+
+Test 3D frame acquisition: 
+integrationTime0: 1000
+integrationTime1: 200
+integrationTime2: 50
+amplitude0: 60
+amplitude1: 60
+amplitude2: 60
+
+HDR: 0
+=======
+Distance frames: 300 time spent: 5.28362 frame rate: 56.7792
+Distance grayscale frames: 300 time spent: 8.2325 frame rate: 36.4409
+Distance amplitude frames: 300 time spent: 10.6044 frame rate: 28.2902
+
+HDR: 1
+=======
+Distance frames: 300 time spent: 3.846 frame rate: 78.0031
+Distance grayscale frames: 300 time spent: 5.09508 frame rate: 58.8803
+Distance amplitude frames: 300 time spent: 6.31463 frame rate: 47.5087
+
+HDR: 2
+=======
+Distance frames: 300 time spent: 15.3615 frame rate: 19.5293
+Distance grayscale frames: 300 time spent: 23.6471 frame rate: 12.6866
+Distance amplitude frames: 300 time spent: 28.3702 frame rate: 10.5745
+Closing serial port: 3
+
