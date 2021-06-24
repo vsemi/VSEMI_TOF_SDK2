@@ -114,5 +114,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/vcam.dir/DependInfo.cmake"
+  "CMakeFiles/camera.dir/DependInfo.cmake"
   )

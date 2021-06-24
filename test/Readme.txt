@@ -1,2 +1,10 @@
-cmake .. -DTARGET_PLATFORM=x64_ubuntu
+sudo chmod a+rw /dev/ttyACM0
+
+cmake ..
+
+make
+
+./camera
+
+
 

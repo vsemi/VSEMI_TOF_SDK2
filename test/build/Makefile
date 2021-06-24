@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named vcam
+# Target rules for targets named camera
 
 # Build rule for target.
-vcam: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 vcam
-.PHONY : vcam
+camera: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 camera
+.PHONY : camera
 
 # fast build rule for target.
-vcam/fast:
-	$(MAKE) -f CMakeFiles/vcam.dir/build.make CMakeFiles/vcam.dir/build
-.PHONY : vcam/fast
+camera/fast:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/build
+.PHONY : camera/fast
 
 src/test.o: src/test.cpp.o
 
@@ -129,7 +129,7 @@ src/test.o: src/test.cpp.o
 
 # target to build an object file
 src/test.cpp.o:
-	$(MAKE) -f CMakeFiles/vcam.dir/build.make CMakeFiles/vcam.dir/src/test.cpp.o
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/test.cpp.o
 .PHONY : src/test.cpp.o
 
 src/test.i: src/test.cpp.i
@@ -138,7 +138,7 @@ src/test.i: src/test.cpp.i
 
 # target to preprocess a source file
 src/test.cpp.i:
-	$(MAKE) -f CMakeFiles/vcam.dir/build.make CMakeFiles/vcam.dir/src/test.cpp.i
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/test.cpp.i
 .PHONY : src/test.cpp.i
 
 src/test.s: src/test.cpp.s
@@ -147,7 +147,7 @@ src/test.s: src/test.cpp.s
 
 # target to generate assembly for a file
 src/test.cpp.s:
-	$(MAKE) -f CMakeFiles/vcam.dir/build.make CMakeFiles/vcam.dir/src/test.cpp.s
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/test.cpp.s
 .PHONY : src/test.cpp.s
 
 # Help Target
@@ -157,7 +157,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
-	@echo "... vcam"
+	@echo "... camera"
 	@echo "... edit_cache"
 	@echo "... src/test.o"
 	@echo "... src/test.i"

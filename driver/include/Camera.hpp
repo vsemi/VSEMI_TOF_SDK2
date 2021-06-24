@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2021 Visionary Semiconductor Inc.
  *
- * @defgroup Camera160
+ * @defgroup Camera
  * @brief camera interface
  * @ingroup driver
  *
@@ -10,34 +10,12 @@
 #ifndef TOF_CAMERA_H_
 #define TOF_CAMERA_H_
 
-#include <ToFImage.hpp>
-
-#include<string>
+#include <string>
 #include <memory>
 
+#include <ToFImage.hpp>
 #include "camera_info.h"
-#include "error.h"
 #include "common.h"
-
-enum OperationMode_e
-{
-	MODE_BEAM_A = 0,                                        ///<Normal operation with illumination beam A, Wide Field
-	MODE_BEAM_B = 1                                         ///<Normal operation with illumination beam B, Narrow Field
-};
-
-enum AcquisitionMode_e
-{
-	SINGLE = 0,
-	AUTO_REPEAT = 1,
-	STREAM = 2
-};
-
-enum HDR_e
-{
-	HDR_OFF = 0,
-	HDR_SPATIAL = 1,
-	HDR_TEMPORAL = 2
-};
 
 class Camera
 {
@@ -67,6 +45,7 @@ public:
 	virtual void setAcquisitionMode(AcquisitionMode_e mode) = 0;
 	virtual ErrorNumber_e setOffset(const int offset) = 0;
 	virtual ErrorNumber_e setIntegrationTime3d(const unsigned int index, const unsigned int integrationTime) = 0;
+	virtual ErrorNumber_e setAutoIntegrationTime3d() = 0;
 
 	virtual ErrorNumber_e setIntegrationTimeGrayscale(const unsigned int integrationTime) = 0;
 	virtual ErrorNumber_e setModulationFrequency(const ModulationFrequency_e modulationFrequency) = 0;
@@ -88,13 +67,17 @@ public:
 
 	int getWidth();
 	int getHeight();
+	virtual void setFoV(double angle_x, double angle_y) = 0;
 
 protected:
-	void setWidth(int w, int h);
+	double _angle_x;
+	double _angle_y;
+
+	void setWidth(int width, int height);
 
 private:
-	int width;
-	int height;
+	int _width;
+	int _height;
 };
 
 #endif /* TOF_CAMERA_H_ */

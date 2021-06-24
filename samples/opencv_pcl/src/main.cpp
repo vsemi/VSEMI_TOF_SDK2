@@ -1,32 +1,12 @@
 #include <iostream>
-
-#include <stdio.h>
 #include <time.h>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <thread>
-#include <mutex>
-#include <vector>
-#include <iterator>
 
-#include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 
 #include <pcl/visualization/pcl_visualizer.h>
 
 #include <Camera.hpp>
-#include <ToFImage.hpp>
-
-#include "thread_safe.h"
-
-using namespace std;
-using namespace cv;
 
 bool update_frame_data = false;
 bool is_stopped = false;
@@ -90,20 +70,28 @@ int main() {
 	ErrorNumber_e status;
 
 	status = camera->setOperationMode(MODE_BEAM_A);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set OperationMode failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Mode failed." << endl;
 
-	status = camera->setOffset(0);
+	status = camera->setModulationFrequency(ModulationFrequency_e::MODULATION_FREQUENCY_20MHZ);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set ModulationFrequency failed." << endl;
+
+	status = camera->setModulationChannel(0, 0);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set tModulationChannel failed." << endl;
+
+	camera->setAcquisitionMode(AUTO_REPEAT);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set AcquisitionMode failed." << endl;
+
+	camera->setOffset(0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Offset failed." << endl;
 
 	unsigned int integrationTime0 = 1000;
-	unsigned int integrationTime1 = 200;
-	unsigned int integrationTime2 = 50;
+	unsigned int integrationTime1 = 50;
 
 	status = camera->setIntegrationTime3d(0, integrationTime0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 0 failed." << endl;
 	status = camera->setIntegrationTime3d(1, integrationTime1);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 1 failed." << endl;
-	status = camera->setIntegrationTime3d(2, integrationTime2);
+	status = camera->setIntegrationTime3d(2, 0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 2 failed." << endl;
 	status = camera->setIntegrationTime3d(3, 0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 3 failed." << endl;
@@ -114,13 +102,12 @@ int main() {
 
 	unsigned int amplitude0 = 60;
 	unsigned int amplitude1 = 60;
-	unsigned int amplitude2 = 60;
 
 	status = camera->setMinimalAmplitude(0, amplitude0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 0 failed." << endl;
 	status = camera->setMinimalAmplitude(1, amplitude1);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 1 failed." << endl;
-	status = camera->setMinimalAmplitude(2, amplitude2);
+	status = camera->setMinimalAmplitude(2, 0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 2 failed." << endl;
 	status = camera->setMinimalAmplitude(3, 0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 3 failed." << endl;
@@ -133,28 +120,17 @@ int main() {
 
 	std::cout << "integrationTime0: " << integrationTime0 << std::endl;
 	std::cout << "integrationTime1: " << integrationTime1 << std::endl;
-	std::cout << "integrationTime2: " << integrationTime2 << std::endl;
 
 	std::cout << "amplitude0: " << amplitude0 << std::endl;
 	std::cout << "amplitude1: " << amplitude1 << std::endl;
-	std::cout << "amplitude2: " << amplitude2 << std::endl;
 
 	camera->setRange(50, 7500);
 
-	//camera->setRoi(70, 20, 89, 39); // small beam for fast frame rate
-	status = camera->setRoi(0, 0, 159, 59);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Roi failed." << endl;
-
-	camera->setAcquisitionMode(AUTO_REPEAT);
-
-	HDR_e hdr = HDR_OFF;
+	HDR_e hdr = HDR_TEMPORAL;
 	status = camera->setHdr(hdr);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
 	std::cout << "\nHDR: " << hdr << std::endl;
 	std::cout << "=======" << std::endl;
-
-	status = camera->setIntegrationTimeGrayscale(8000);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTimeGrayscale failed." << endl;
 
 	tofImage = new ToFImage(camera->getWidth(), camera->getHeight());
 
@@ -174,7 +150,7 @@ int main() {
 			break;
 		}
 
-		*depth_bgr = Mat(tofImage->height, tofImage->width, CV_8UC3, tofImage->data_2d_bgr);
+		*depth_bgr = cv::Mat(tofImage->height, tofImage->width, CV_8UC3, tofImage->data_2d_bgr);
 
 		pcl::PointXYZRGB* data_ptr = reinterpret_cast<pcl::PointXYZRGB*>(tofImage->data_3d_xyz_rgb);
 		std::vector<pcl::PointXYZRGB> pts(data_ptr, data_ptr + tofImage->n_points);

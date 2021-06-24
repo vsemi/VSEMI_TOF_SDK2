@@ -1,103 +1,35 @@
-#include <stdio.h>
+#include <iostream>
 #include <time.h>
 #include <string>
-#include <iostream>
-#include <iomanip>      // std::setprecision
 #include <thread>
 
 #include <ros/ros.h>
-#include <ros/package.h>
 #include <dynamic_reconfigure/server.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/PointCloud2.h>
 
-#include <std_msgs/Int32MultiArray.h>
-#include <geometry_msgs/PoseStamped.h>
-
-#include <visualization_msgs/MarkerArray.h>
-#include <visualization_msgs/Marker.h>
-
 #include <pcl_conversions/pcl_conversions.h>
 
-#include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include <Eigen/Core>
-
-#include <flann/flann.h>
-
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-
-#include <pcl/common/io.h>
-#include <pcl/common/time.h>
-
-#include <pcl/console/print.h>
-
-#include <pcl/io/pcd_io.h>
-
-#include <pcl/ModelCoefficients.h>
-
-#include <pcl/kdtree/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
-
 #include <pcl/filters/filter.h>
-#include <pcl/filters/voxel_grid.h>
-#include <pcl/filters/extract_indices.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/filters/statistical_outlier_removal.h>
-#include <pcl/filters/radius_outlier_removal.h>
-#include <pcl/filters/conditional_removal.h>
-#include <pcl/filters/extract_indices.h>
-#include <pcl/filters/project_inliers.h>
-
-#include <pcl/search/organized.h>
-#include <pcl/search/kdtree.h>
-
-#include <pcl/features/don.h>
-#include <pcl/features/vfh.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/features/normal_3d_omp.h>
-#include <pcl/features/fpfh_omp.h>
-#include <pcl/features/moment_of_inertia_estimation.h>
-
-#include <pcl/surface/mls.h>
-#include <pcl/surface/concave_hull.h>
-
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
-
-#include <pcl/segmentation/sac_segmentation.h>
-#include <pcl/segmentation/min_cut_segmentation.h>
-#include <pcl/segmentation/extract_clusters.h>
-
-#include <pcl/registration/icp.h>
-#include <pcl/registration/sample_consensus_prerejective.h>
-
-#include <pcl/visualization/pcl_visualizer.h>
 
 #include <vsemi_tof_ros/vsemi_tof_rosConfig.h>
 
 #include "Camera.hpp"
-#include "ToFImage.hpp"
 #include "settings.h"
 
 using namespace std;
-
-static string package_path = "";
 
 static ros::Publisher cloud_scene_publisher;
 static ros::Publisher image_depth_Publisher;
 static ros::Publisher image_grayscale_Publisher;
 static ros::Publisher image_amplitude_Publisher;
 
-static Settings settings;
-
 static std::string strFrameID = "sensor_frame"; 
 
-uint orientation = 0;
-
+static Settings settings;
 ToFImage* tofImage;
 bool running = true;
 static bool update_frame_data = false;
@@ -105,10 +37,6 @@ static bool process_busy = false;
 
 void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 {
-	ROS_INFO("Update config ...");
-
-	settings.mode = static_cast<uint>(config.mode);
-	
 	settings.image_type = static_cast<uint>(config.image_type);
 
 	settings.hdr = static_cast<uint>(config.hdr);
@@ -133,24 +61,21 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 
 	settings.dcsFilter = config.dcs_filter;
 
-	settings.roi_leftX   = static_cast<uint>(config.roi_left_x);
-	settings.roi_topY    = static_cast<uint>(config.roi_top_y);
-	settings.roi_rightX  = static_cast<uint>(config.roi_right_x);
-	settings.roi_bottomY = static_cast<uint>(config.roi_bottom_y);
-
 	settings.range   = static_cast<uint>(config.range);
 
 	settings.angle_x = config.angle_x;
 	settings.angle_y = config.angle_y;
 
-	settings.pointCloudColor = static_cast<uint>(config.point_cloud_color);
-
 	settings.updateParam = true;
+	std::cout << "settings.updateParam: " << settings.updateParam << std::endl;
 }
 
 void updateCamera(Camera* camera)
 {
+	std::cout << "Update camera ... " << std::endl;
+
 	ErrorNumber_e status;
+
 	if (settings.hdr == 0)
 	{
 		status = camera->setHdr(HDR_OFF);
@@ -161,25 +86,43 @@ void updateCamera(Camera* camera)
 	{
 		status = camera->setHdr(HDR_TEMPORAL);
 	}
-
+	std::cout << "HDR: " << settings.hdr << std::endl;
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
-	std::cout << "\nHDR: " << settings.hdr << std::endl;
 
-	status = camera->setIntegrationTime3d(0, settings.integrationTimeATOF0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 0 failed." << endl;
-	status = camera->setIntegrationTime3d(1, settings.integrationTimeATOF1);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 1 failed." << endl;
-	status = camera->setIntegrationTime3d(2, settings.integrationTimeATOF2);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 2 failed." << endl;
-	status = camera->setIntegrationTime3d(3, settings.integrationTimeATOF3);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 3 failed." << endl;
-	status = camera->setIntegrationTime3d(4, settings.integrationTimeBTOF4);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 4 failed." << endl;
-	status = camera->setIntegrationTime3d(5, settings.integrationTimeBTOF5);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 5 failed." << endl;
+	if (settings.hdr == 2)
+	{
+		settings.automaticIntegrationTime = false;
+	}
+
+	if (settings.automaticIntegrationTime)
+	{
+		camera->setAutoIntegrationTime3d();
+	} else
+	{
+		status = camera->setIntegrationTime3d(0, settings.integrationTimeATOF0);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 0 failed." << endl;
+		status = camera->setIntegrationTime3d(1, settings.integrationTimeATOF1);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 1 failed." << endl;
+		status = camera->setIntegrationTime3d(2, settings.integrationTimeATOF2);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 2 failed." << endl;
+		status = camera->setIntegrationTime3d(3, settings.integrationTimeATOF3);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 3 failed." << endl;
+		status = camera->setIntegrationTime3d(4, settings.integrationTimeBTOF4);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 4 failed." << endl;
+		status = camera->setIntegrationTime3d(5, settings.integrationTimeBTOF5);
+		if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 5 failed." << endl;
+
+		std::cout << "integrationTimeATOF0: " << settings.integrationTimeATOF0 << std::endl;
+		std::cout << "integrationTimeATOF1: " << settings.integrationTimeATOF1 << std::endl;
+		std::cout << "integrationTimeATOF2: " << settings.integrationTimeATOF2 << std::endl;
+		std::cout << "integrationTimeATOF3: " << settings.integrationTimeATOF3 << std::endl;
+		std::cout << "integrationTimeBTOF4: " << settings.integrationTimeBTOF4 << std::endl;
+		std::cout << "integrationTimeBTOF5: " << settings.integrationTimeBTOF5 << std::endl;
+	}
 
 	status = camera->setIntegrationTimeGrayscale(settings.integrationTimeGray);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTimeGrayscale failed." << endl;
+	std::cout << "integrationTimeGray: " << settings.integrationTimeGray << std::endl;
 
 	status = camera->setMinimalAmplitude(0, settings.minAmplitude0);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 0 failed." << endl;
@@ -193,12 +136,21 @@ void updateCamera(Camera* camera)
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 4 failed." << endl;
 	status = camera->setMinimalAmplitude(5, settings.minAmplitude5);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 5 failed." << endl;
+	std::cout << "minAmplitude0: " << settings.minAmplitude0 << std::endl;
+	std::cout << "minAmplitude1: " << settings.minAmplitude1 << std::endl;
+	std::cout << "minAmplitude2: " << settings.minAmplitude2 << std::endl;
+	std::cout << "minAmplitude3: " << settings.minAmplitude3 << std::endl;
+	std::cout << "minAmplitude4: " << settings.minAmplitude4 << std::endl;
+	std::cout << "minAmplitude5: " << settings.minAmplitude5 << std::endl;
 
 	camera->setRange(0, settings.range);
-	std::cout << "\nRange: " << settings.range << std::endl;
+	std::cout << "range: " << settings.range << std::endl;
 
-	status = camera->setRoi(settings.roi_leftX, settings.roi_topY, settings.roi_rightX, settings.roi_bottomY);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Roi failed." << endl;
+	camera->setFoV(settings.angle_x, settings.angle_y);
+	std::cout << "angle_x: " << settings.angle_x << std::endl;
+	std::cout << "angle_y: " << settings.angle_y << std::endl;
+
+	camera->setDcsFilter(settings.dcsFilter);
 
 	settings.updateParam = false;
 }
@@ -211,8 +163,6 @@ void initialise()
 	image_depth_Publisher     = nh.advertise<sensor_msgs::Image>("image_depth", 1);
 	image_grayscale_Publisher = nh.advertise<sensor_msgs::Image>("image_grayscale", 1);
 	image_amplitude_Publisher = nh.advertise<sensor_msgs::Image>("image_amplitude", 1);
-
-	//settings.updateParam = false;
 }
 
 void publish_cloud(ros::Publisher publisher, pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, ros::Time time) {
@@ -236,7 +186,6 @@ void publish_image(ros::Publisher publisher, cv::Mat image, ros::Time time) {
 	ros_msg.height = image.rows;
 	ros_msg.width = image.cols;
 	ros_msg.encoding = sensor_msgs::image_encodings::BGR8;
-	//ros_msg.is_bigendian = (boost::endian::order::native == boost::endian::order::big);
 	ros_msg.step = image.cols * image.elemSize();
 	size_t size = ros_msg.step * image.rows;
 	ros_msg.data.resize(size);
@@ -273,33 +222,11 @@ void process_scene(pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene, cv::Mat depth_b
 
 	ros::Time curTime = ros::Time::now();
 
-	// clean up the point cloud
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene_clean(new pcl::PointCloud<pcl::PointXYZRGB>);
 	std::vector<int> scene_indices;
 	pcl::removeNaNFromPointCloud(*scene, *scene_clean, scene_indices);
 
-	// skip empty cloud
 	if ((! scene_clean->empty()) && scene_clean->points.size() > 0) {
-/*
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene_filtered(new pcl::PointCloud<pcl::PointXYZRGB>);
-		pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
-		sor.setInputCloud(scene_clean);
-		sor.setMeanK(30);
-		sor.setStddevMulThresh(1.0);
-		sor.filter(*scene_filtered);
-*/
-		// scene transform if you know the camera pose
-		//Eigen::Matrix3f rotation_matrix3f;
-		//rotation_matrix3f = 
-		//	  Eigen::AngleAxisf(0.55, Eigen::Vector3f::UnitX())
-		//	* Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())
-		//	* Eigen::AngleAxisf(0, Eigen::Vector3f::UnitZ());
-		//
-		//Eigen::Affine3f transform_affine3f = Eigen::Affine3f::Identity();
-		//transform_affine3f.translation() << 0, 1.0, -1.0;
-		//transform_affine3f.rotate(rotation_matrix3f);
-		//pcl::transformPointCloud (*scene_filtered, *scene_filtered, transform_affine3f);
-
 		publish_cloud(cloud_scene_publisher, scene_clean, curTime);
 
 		cvtColor(grayscale, grayscale, cv::COLOR_GRAY2BGR);
@@ -315,9 +242,6 @@ void process_scene(pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene, cv::Mat depth_b
 	process_busy = false;
 } 
 
-/**
-* to receive a frame
-*/
 void tof_image_received()
 {
 	while (running) {
@@ -338,31 +262,8 @@ void tof_image_received()
 			cloud_scene->height = 1;
 			cloud_scene->is_dense = false;
 
-			if (orientation == 1) {	
-				cv::Mat depth_bgr_rotated(tofImage->width, tofImage->height, CV_8UC3, cv::Scalar(0, 0, 0));
-				cv::Mat grayscale_rotated(tofImage->width, tofImage->height, CV_8UC1, cv::Scalar(0));
-				cv::Mat amplitude_rotated(tofImage->width, tofImage->height, CV_32F, 0.0);
+			process_scene(cloud_scene, depth_bgr.clone(), grayscale.clone(), amplitude.clone());
 
-				cv::rotate(depth_bgr, depth_bgr_rotated, cv::ROTATE_90_COUNTERCLOCKWISE);
-				cv::rotate(grayscale, grayscale_rotated, cv::ROTATE_90_COUNTERCLOCKWISE);
-				cv::rotate(amplitude, amplitude_rotated, cv::ROTATE_90_COUNTERCLOCKWISE);
-
-				Eigen::Matrix3f r;
-				r = 
-					  Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())
-					* Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())
-					* Eigen::AngleAxisf(-3.14159265 * 0.5, Eigen::Vector3f::UnitZ());
-
-				Eigen::Affine3f t = Eigen::Affine3f::Identity();
-				t.translation() << 0, 0, 0;
-				t.rotate(r);
-				pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene_rotated(new pcl::PointCloud<pcl::PointXYZRGB>);
-				pcl::transformPointCloud (*cloud_scene, *scene_rotated, t);
-
-				process_scene(scene_rotated, depth_bgr_rotated.clone(), grayscale_rotated.clone(), amplitude_rotated.clone());
-			} else {
-				process_scene(cloud_scene, depth_bgr.clone(), grayscale.clone(), amplitude.clone());
-			}
 			update_frame_data = false;
 		} else {
 			usleep(1000);
@@ -384,18 +285,34 @@ void require_tof_image() {
 	ErrorNumber_e status;
 
 	status = camera->setOperationMode(MODE_BEAM_A);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set OperationMode failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Mode failed." << endl;
+
+	status = camera->setModulationFrequency(ModulationFrequency_e::MODULATION_FREQUENCY_20MHZ);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set ModulationFrequency failed." << endl;
+
+	status = camera->setModulationChannel(0, 0);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set tModulationChannel failed." << endl;
 
 	camera->setAcquisitionMode(AUTO_REPEAT);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set AcquisitionMode failed." << endl;
+
+	camera->setOffset(0);
+	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Offset failed." << endl;
 
 	tofImage = new ToFImage(camera->getWidth(), camera->getHeight());
 
 	clock_t start, stop;
 	int n_frames = 0;
+	double interval, frame_rate;
 	start = clock();
 	while (running) {
 		if (settings.updateParam) 
 		{
+			stop = clock();
+			interval = (double)(stop - start) / CLOCKS_PER_SEC;
+			frame_rate = ((double) n_frames) / interval;
+			std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
+
 			updateCamera(camera);
 			start = clock();
 			n_frames = 0;
@@ -415,8 +332,8 @@ void require_tof_image() {
 		}
 	}
 	stop = clock();
-	double interval = (double)(stop - start) / CLOCKS_PER_SEC;
-	double frame_rate = ((double) n_frames) / interval;
+	interval = (double)(stop - start) / CLOCKS_PER_SEC;
+	frame_rate = ((double) n_frames) / interval;
 	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 
 	running = false;
@@ -436,8 +353,6 @@ int main(int argc, char **argv)
 	dynamic_reconfigure::Server<vsemi_tof_ros::vsemi_tof_rosConfig>::CallbackType f;
 	f = boost::bind(&updateConfig, _1, _2);
 	server.setCallback(f);
-
-	package_path = ros::package::getPath("vsemi_tof_ros");
 
 	initialise();
 

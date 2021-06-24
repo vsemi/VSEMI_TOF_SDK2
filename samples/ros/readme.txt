@@ -1,9 +1,6 @@
-The sample 2, to work with ROS to show depth map and point cloud obtained from ToF sensor, which requires ROS Melodic as dependency.
+Working with ROS to show depth map and point cloud obtained from ToF sensor, which requires ROS as dependency.
 
 Prerequisites:
-
-  x64
-  ubuntu
   ROS
 
 Install ROS Melodic
@@ -40,7 +37,7 @@ Build and run sample application:
 
   >> sudo chmod a+rxw src/vsemi_tof_ros/cfg/vsemi_tof_ros.cfg
 
-  >> catkin_make -DTARGET_PLATFORM=x64_ubuntu
+  >> catkin_make
 
 4. To start the ROS sample application, run command:
 
@@ -53,3 +50,4 @@ Build and run sample application:
   >> ./run.sh
 
 5. To stop ROS, please press Ctr + C in terminal 
+

@@ -1,19 +1,7 @@
-//============================================================================
-// Name        : test.cpp
-// Author      : Horace.Li@vsemi.io
-// Version     :
-// Copyright   : Visionary Semiconductor Inc.
-// Description : Test
-//============================================================================
-
 #include <iostream>
 #include <time.h>
 
-#include "camera_info.h"
 #include <Camera.hpp>
-#include <ToFImage.hpp>
-
-using namespace std;
 
 void test_general_info(Camera* camera)
 {
@@ -21,22 +9,22 @@ void test_general_info(Camera* camera)
 
 	uint16_t chipId, waferId;
 	status = camera->getChipInformation(chipId, waferId);
-	if (status == ERROR_NUMMBER_NO_ERROR) cout << "Chip:\n   wafer:   " << waferId << "\n   ID:      " << chipId << endl;
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Chip:\n   wafer:   " << waferId << "\n   ID:      " << chipId << std::endl;
 	else std::cerr << "Error: " << status << std::endl;
 
 	unsigned int device, version;
 	status = camera->getIdentification(device, version);
-	if (status == ERROR_NUMMBER_NO_ERROR) cout << "Identification:\n   device:  " << device << "\n   version: " << version << endl;
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Identification:\n   device:  " << device << "\n   version: " << version << std::endl;
 	else std::cerr << "Error: " << status << std::endl;
 
 	unsigned int major, minor;
 	status = camera->getFirmwareRelease(major, minor);
-	if (status == ERROR_NUMMBER_NO_ERROR) cout << "Firmware:\n   major:   " << major << "\n   minor:   " << minor << endl;
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Firmware:\n   major:   " << major << "\n   minor:   " << minor << std::endl;
 	else std::cerr << "Error: " << status << std::endl;
 
 	int16_t temperature;
 	status = camera->getTemperature(temperature);
-	if (status == ERROR_NUMMBER_NO_ERROR) cout << "Temperature         :   " << temperature << endl;
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Temperature         :   " << temperature << std::endl;
 	else std::cerr << "Error: " << status << std::endl;
 
 	CameraInfo cameraInfo;
@@ -144,75 +132,59 @@ void test()
 	ErrorNumber_e status;
 
 	status = camera->setOperationMode(MODE_BEAM_A);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set OperationMode failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set OperationMode failed." << std::endl;
 
 	status = camera->setOffset(0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Offset failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set Offset failed." << std::endl;
 
 	unsigned int integrationTime0 = 1000;
-	unsigned int integrationTime1 = 200;
-	unsigned int integrationTime2 = 50;
+	unsigned int integrationTime1 = 50;
 
 	status = camera->setIntegrationTime3d(0, integrationTime0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 0 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 0 failed." << std::endl;
 	status = camera->setIntegrationTime3d(1, integrationTime1);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 1 failed." << endl;
-	status = camera->setIntegrationTime3d(2, integrationTime2);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 2 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 1 failed." << std::endl;
+	status = camera->setIntegrationTime3d(2, 0);
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 2 failed." << std::endl;
 	status = camera->setIntegrationTime3d(3, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 3 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 3 failed." << std::endl;
 	status = camera->setIntegrationTime3d(4, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 4 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 4 failed." << std::endl;
 	status = camera->setIntegrationTime3d(5, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set IntegrationTime3d 5 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set IntegrationTime3d 5 failed." << std::endl;
 
 	unsigned int amplitude0 = 60;
 	unsigned int amplitude1 = 60;
-	unsigned int amplitude2 = 60;
 
 	status = camera->setMinimalAmplitude(0, amplitude0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 0 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 0 failed." << std::endl;
 	status = camera->setMinimalAmplitude(1, amplitude1);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 1 failed." << endl;
-	status = camera->setMinimalAmplitude(2, amplitude2);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 2 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 1 failed." << std::endl;
+	status = camera->setMinimalAmplitude(2, 0);
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 2 failed." << std::endl;
 	status = camera->setMinimalAmplitude(3, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 3 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 3 failed." << std::endl;
 	status = camera->setMinimalAmplitude(4, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 4 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 4 failed." << std::endl;
 	status = camera->setMinimalAmplitude(5, 0);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set MinimalAmplitude 5 failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set MinimalAmplitude 5 failed." << std::endl;
 
 	std::cout << "\nTest 3D frame acquisition: " << std::endl;
 
 	std::cout << "integrationTime0: " << integrationTime0 << std::endl;
 	std::cout << "integrationTime1: " << integrationTime1 << std::endl;
-	std::cout << "integrationTime2: " << integrationTime2 << std::endl;
 
 	std::cout << "amplitude0: " << amplitude0 << std::endl;
 	std::cout << "amplitude1: " << amplitude1 << std::endl;
-	std::cout << "amplitude2: " << amplitude2 << std::endl;
 
 	camera->setRange(50, 7500);
 
-	//camera->setRoi(70, 20, 89, 39); // small beam for fast frame rate
-	status = camera->setRoi(0, 0, 159, 59);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Roi failed." << endl;
-
 	camera->setAcquisitionMode(AUTO_REPEAT);
+	HDR_e hdr;
 
-	HDR_e hdr = HDR_OFF;
+	hdr = HDR_OFF;
 	status = camera->setHdr(hdr);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
-	std::cout << "\nHDR: " << hdr << std::endl;
-	std::cout << "=======" << std::endl;
-	test_distance(camera, 300);
-	test_distance_grayscale(camera, 300);
-	test_distance_amplitude(camera, 300);
-
-	hdr = HDR_SPATIAL;
-	status = camera->setHdr(hdr);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set HDR failed." << std::endl;
 	std::cout << "\nHDR: " << hdr << std::endl;
 	std::cout << "=======" << std::endl;
 	test_distance(camera, 300);
@@ -221,7 +193,7 @@ void test()
 
 	hdr = HDR_TEMPORAL;
 	status = camera->setHdr(hdr);
-	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set HDR failed." << std::endl;
 	std::cout << "\nHDR: " << hdr << std::endl;
 	std::cout << "=======" << std::endl;
 	test_distance(camera, 300);
@@ -231,10 +203,9 @@ void test()
 	delete camera;
 }
 
-
 int main() {
 
-	cout << "Starting ..." << endl;
+	std::cout << "Test starting ..." << std::endl;
 
 	test();
 

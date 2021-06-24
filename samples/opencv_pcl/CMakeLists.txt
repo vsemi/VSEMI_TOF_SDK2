@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.5.0)
 
 PROJECT(vsemi_tof_pcl)
 
-SET(TARGET_PLATFORM "x64_ubuntu" CACHE STRING "Target platform for Vsemi ToF Driver")
+EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 
-message("TARGET_PLATFORM set to ${TARGET_PLATFORM}")
+message( STATUS "Architecture: ${ARCHITECTURE}" )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
@@ -21,7 +21,7 @@ file(GLOB app_INCLUDE_DIR
 )
 
 file(GLOB app_LIB_DIR
-    "../../driver/lib/${TARGET_PLATFORM}"
+    "../../driver/lib/${ARCHITECTURE}"
 )
 
 file(GLOB app_SRC
@@ -35,9 +35,9 @@ link_directories( ${OpenCV_LIBRARY_DIRS} ${PCL_LIBRARY_DIRS} ${app_LIB_DIR})
 
 add_definitions(${PCL_DEFINITIONS})
 
-ADD_EXECUTABLE(vcam ${app_SRC})
+ADD_EXECUTABLE(camera ${app_SRC})
 
-TARGET_LINK_LIBRARIES(vcam ${OpenCV_LIBS} ${PCL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} vsemi_tof_cam)
+TARGET_LINK_LIBRARIES(camera ${OpenCV_LIBS} ${PCL_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} vsemi_tof_cam)
 
-set_property(TARGET vcam PROPERTY CXX_STANDARD 11)
+set_property(TARGET camera PROPERTY CXX_STANDARD 11)
 

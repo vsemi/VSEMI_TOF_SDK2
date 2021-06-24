@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.5.0)
 project(vsemi_tof_ros)
 
-SET(TARGET_PLATFORM "x64_ubuntu" CACHE STRING "Target platform for Vsemi ToF Driver")
+EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 
-message("TARGET_PLATFORM set to ${TARGET_PLATFORM}")
+message( STATUS "Architecture: ${ARCHITECTURE}" )
 
 add_compile_options(-std=c++11)
 
@@ -49,12 +49,12 @@ include_directories(
 )
 
 link_directories(
-  ../../../../driver/lib/${TARGET_PLATFORM}
+  ../../../../driver/lib/${ARCHITECTURE}
 )
 
 add_executable(tof_cam_node
-                src/tof_cam_node.cpp
-               )
+  src/tof_cam_node.cpp
+)
 
 ######################################################################
 # make sure configure headers are built before any node using them   #
@@ -70,7 +70,6 @@ target_link_libraries(tof_cam_node ${OpenCV_LIBS})
 
 target_link_libraries(tof_cam_node vsemi_tof_cam)
 
-
 #############
 ## Install ##
 #############
@@ -79,7 +78,7 @@ install(TARGETS tof_cam_node
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
- )
-
+)
 
 install(DIRECTORY launch  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+

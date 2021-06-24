@@ -22,8 +22,6 @@ struct Settings{
 
 	bool updateParam;  /*! true to start ToF sensor */
 
-	uint  mode;        /*! 0 for wide FOV, and 1 for narrow beam */
-
 	uint image_type;   /*! 0 for distance only, and 1 for distance and grayscale, 2 for distance and amplitude */
 
 	uint  hdr;         /*! 0 HDR off, 1 for HDR spatial and 2 for HDR temporal */
@@ -48,17 +46,10 @@ struct Settings{
 
 	bool dcsFilter;                /*! true to enable DCS spatial filter */
 
-	uint roi_leftX;    /*! 0 - 160 (image width)  region of interest left   x */
-	uint roi_topY;     /*! 0 -  60 (image height) region of interest top    y */
-	uint roi_rightX;   /*! 0 - 160 (image width)  region of interest right  x */
-	uint roi_bottomY;  /*! 0 -  60 (image height) region of interest bottom y */
-
 	int range;                  /*! 0 - 9000, the depth range in mm, for coloring the BGR depth map and the 3D points */
 
 	double angle_x      = 55.0f;  /*! horizontal angle of the FOV, modify this to calibrate horizontal angle of the FOV */
 	double angle_y      = 20.625f; /*! vertical angle of the FOV, modify this to calibrate vertical angle of the FOV */
-
-	uint pointCloudColor = 0; /*! point cloud color scheme, 0 - distance pseudo color, 1 - grayscale */
 };
 
 #endif // VSEMI_TOF_DRIVER_SETTINGS_H
