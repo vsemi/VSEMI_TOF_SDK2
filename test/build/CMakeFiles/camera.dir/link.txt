@@ -1,1 +1,0 @@
-/usr/bin/c++     CMakeFiles/camera.dir/src/test.cpp.o  -o camera  -L/home/vsemi/sdk/VSEMI_TOF_SDK2/test/../driver/lib/x86_64 -Wl,-rpath,/home/vsemi/sdk/VSEMI_TOF_SDK2/test/../driver/lib/x86_64 -lvsemi_tof_cam 

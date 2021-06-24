@@ -1,3 +1,0 @@
-/home/vsemi/sdk/VSEMI_TOF_SDK2/samples/opencv_pcl/build/CMakeFiles/rebuild_cache.dir
-/home/vsemi/sdk/VSEMI_TOF_SDK2/samples/opencv_pcl/build/CMakeFiles/camera.dir
-/home/vsemi/sdk/VSEMI_TOF_SDK2/samples/opencv_pcl/build/CMakeFiles/edit_cache.dir
