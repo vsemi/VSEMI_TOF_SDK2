@@ -134,6 +134,15 @@ void test()
 	status = camera->setOperationMode(MODE_BEAM_A);
 	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set OperationMode failed." << std::endl;
 
+	status = camera->setModulationFrequency(MODULATION_FREQUENCY_20MHZ);
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set ModulationFrequency failed." << std::endl;
+
+	status = camera->setModulationChannel(0, 0);
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set tModulationChannel failed." << std::endl;
+
+	camera->setAcquisitionMode(AUTO_REPEAT);
+	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set AcquisitionMode failed." << std::endl;
+
 	status = camera->setOffset(0);
 	if (status != ERROR_NUMMBER_NO_ERROR) std::cerr << "Set Offset failed." << std::endl;
 
@@ -179,7 +188,6 @@ void test()
 
 	camera->setRange(50, 7500);
 
-	camera->setAcquisitionMode(AUTO_REPEAT);
 	HDR_e hdr;
 
 	hdr = HDR_OFF;

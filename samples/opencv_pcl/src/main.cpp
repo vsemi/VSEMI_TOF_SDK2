@@ -75,7 +75,7 @@ int main() {
 	status = camera->setModulationFrequency(ModulationFrequency_e::MODULATION_FREQUENCY_20MHZ);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set ModulationFrequency failed." << endl;
 
-	status = camera->setModulationChannel(0, 0);
+	status = camera->setModulationChannel(0, 1);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set tModulationChannel failed." << endl;
 
 	camera->setAcquisitionMode(AUTO_REPEAT);
@@ -124,9 +124,11 @@ int main() {
 	std::cout << "amplitude0: " << amplitude0 << std::endl;
 	std::cout << "amplitude1: " << amplitude1 << std::endl;
 
+	camera->setIntegrationTimeGrayscale(6000);
+
 	camera->setRange(50, 7500);
 
-	HDR_e hdr = HDR_TEMPORAL;
+	HDR_e hdr = HDR_TEMPORAL; // HDR_OFF;//
 	status = camera->setHdr(hdr);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
 	std::cout << "\nHDR: " << hdr << std::endl;
@@ -142,7 +144,9 @@ int main() {
 	start = clock();
 	while (!is_stopped)
 	{
-		status = camera->getDistance(*tofImage);
+		//std::cout << "1 =======" << std::endl;
+		status = camera->getDistanceGrayscale(*tofImage);
+		//std::cout << "2 =======" << std::endl;
 		if (status != ERROR_NUMMBER_NO_ERROR)
 		{
 			is_stopped = true;
