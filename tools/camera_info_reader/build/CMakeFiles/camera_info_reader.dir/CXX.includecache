@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../../../driver/include/Camera.hpp
+string
+-
+memory
+-
+ToFImage.hpp
+-
+camera_info.h
+../../../driver/include/camera_info.h
+common.h
+../../../driver/include/common.h
+
+../../../driver/include/ToFImage.hpp
+stdint.h
+-
+
+../../../driver/include/camera_info.h
+stdint.h
+-
+
+../../../driver/include/common.h
+
+/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/src/camera_info_reader.cpp
+iostream
+-
+time.h
+-
+Camera.hpp
+-
+

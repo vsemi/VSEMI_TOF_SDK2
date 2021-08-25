@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/camera_info_reader.dir/src/camera_info_reader.cpp.o  -o camera_info_reader  -L/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/../../driver/lib/x86_64 -Wl,-rpath,/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/../../driver/lib/x86_64 -lvsemi_tof_cam 
