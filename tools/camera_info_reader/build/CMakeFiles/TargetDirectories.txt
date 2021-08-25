@@ -1,3 +1,0 @@
-/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/build/CMakeFiles/rebuild_cache.dir
-/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/build/CMakeFiles/camera_info_reader.dir
-/home/vsemi/dev/projects/VSEMI_TOF_SDK2/tools/camera_info_reader/build/CMakeFiles/edit_cache.dir
