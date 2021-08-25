@@ -1,10 +1,13 @@
-# Run command line from the build folder:
 
-sudo chmod a+rw /dev/ttyACM0
+mkdir build
+
+cd build
 
 cmake ..
 
 make
+
+sudo chmod a+rw /dev/ttyACM0
 
 ./camera_info_reader
 
