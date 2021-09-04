@@ -423,20 +423,6 @@ void start() {
 			Channel* channel = it->second;
 			if (channel->frame_ready)
 			{
-				if (chn != chn_central)
-				{
-					int i = chn - chn_central;
-
-					Eigen::Matrix3f rotation_matrix3f;
-					rotation_matrix3f = 
-						  Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())
-						* Eigen::AngleAxisf(M_PI * i * globle_settings.angle_x / 180.0, Eigen::Vector3f::UnitY())
-						* Eigen::AngleAxisf(0, Eigen::Vector3f::UnitZ());
-					
-					Eigen::Affine3f transform_affine3f = Eigen::Affine3f::Identity();
-					transform_affine3f.rotate(rotation_matrix3f);
-					pcl::transformPointCloud (*channel->_cloud, *channel->_cloud, transform_affine3f);
-				}
 				publish_cloud(cloud_publishers[id], channel->_cloud, curTime);
 
 				if (chn == 0)

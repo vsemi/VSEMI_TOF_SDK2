@@ -57,7 +57,9 @@ Run sample application under root:
   >> sudo -s
 
   >> ./run.sh
+  
+3. Turn on check box "Point Cloud 0 - 5" (refer to screenshot) to view point cloud captured by each sensor.
 
-3. To stop ROS, please press Ctr + C in terminal 
+4. To stop ROS, please press Ctr + C in terminal 
 
 
