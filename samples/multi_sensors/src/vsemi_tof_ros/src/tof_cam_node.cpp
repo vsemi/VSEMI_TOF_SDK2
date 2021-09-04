@@ -341,7 +341,7 @@ void start() {
 
 	bool succeed = false;
 	int i = 0;
-	while(i < 6 && channels.size() < 3)
+	while(i < 6 && channels.size() < 6)
 	{
 		std::string port = "/dev/ttyACM" + std::to_string(i);
 		Channel* channel = new Channel(port, &globle_settings);
