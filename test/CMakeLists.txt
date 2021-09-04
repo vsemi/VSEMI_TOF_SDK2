@@ -26,5 +26,5 @@ ADD_EXECUTABLE( camera ${app_SRC})
 
 TARGET_LINK_LIBRARIES( camera vsemi_tof_cam )
 
-set_property(TARGET camera PROPERTY CXX_STANDARD 98)
+set_property(TARGET camera PROPERTY CXX_STANDARD 11)
 

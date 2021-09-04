@@ -1,29 +1,26 @@
-Working with ROS to show depth map and point cloud obtained from ToF sensor, which requires ROS as dependency.
-
 Prerequisites:
   ROS
 
-Install ROS Melodic
+Install ROS Noetic
 
   >> sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
-  >> sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+  >> sudo apt install curl # if you haven't already installed curl
+     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
   >> sudo apt update
+  
+  >> sudo apt install ros-noetic-desktop-full
 
-  >> sudo apt install ros-melodic-desktop-full
-
-  >> sudo rosdep init
-
-  >> rosdep update
-
-  >> echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-
+  >> echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+  
   >> source ~/.bashrc
 
-  >> sudo apt install python-rosinstall python-rosinstall-generator python-wstool build-essential
+  >> sudo apt install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
+    
+  >> sudo rosdep init
   
-  ## If there is no error throughout the above installation process, dependencies should have been installed successfully.
+  >> rosdep update
 
 Build and run sample application:
 

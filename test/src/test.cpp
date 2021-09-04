@@ -1,5 +1,5 @@
 #include <iostream>
-#include <time.h>
+#include <chrono>
 
 #include <Camera.hpp>
 
@@ -51,8 +51,10 @@ void test_distance(Camera* camera, int n_frames)
 	ToFImage tofImage(camera->getWidth(), camera->getHeight());
 	camera->setIntegrationTimeGrayscale(0);
 
-	clock_t start, stop;
-	start = clock();
+	std::chrono::steady_clock::time_point st_time;
+	std::chrono::steady_clock::time_point en_time;
+	double interval, frame_rate;
+	st_time = std::chrono::steady_clock::now();
 	for (int i = 0; i < n_frames; i ++)
 	{
 		status = camera->getDistance(tofImage);
@@ -62,9 +64,9 @@ void test_distance(Camera* camera, int n_frames)
 			break;
 		}
 	}
-	stop = clock();
-	double interval = (double)(stop - start) / CLOCKS_PER_SEC;
-	double frame_rate = ((double) n_frames) / interval;
+	en_time = std::chrono::steady_clock::now();
+	interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
+	frame_rate = ((double) n_frames) / interval;
 	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 }
 
@@ -75,8 +77,10 @@ void test_distance_grayscale(Camera* camera, int n_frames)
 	ToFImage tofImage(camera->getWidth(), camera->getHeight());
 	camera->setIntegrationTimeGrayscale(6000);
 
-	clock_t start, stop;
-	start = clock();
+	std::chrono::steady_clock::time_point st_time;
+	std::chrono::steady_clock::time_point en_time;
+	double interval, frame_rate;
+	st_time = std::chrono::steady_clock::now();
 	for (int i = 0; i < n_frames; i ++)
 	{
 		status = camera->getDistanceGrayscale(tofImage);
@@ -86,10 +90,10 @@ void test_distance_grayscale(Camera* camera, int n_frames)
 			break;
 		}
 	}
-	stop = clock();
-	double interval = (double)(stop - start) / CLOCKS_PER_SEC;
-	double frame_rate = ((double) n_frames) / interval;
-	std::cout << "Distance grayscale frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
+	en_time = std::chrono::steady_clock::now();
+	interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
+	frame_rate = ((double) n_frames) / interval;
+	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 }
 
 void test_distance_amplitude(Camera* camera, int n_frames)
@@ -99,8 +103,10 @@ void test_distance_amplitude(Camera* camera, int n_frames)
 	ToFImage tofImage(camera->getWidth(), camera->getHeight());
 	camera->setIntegrationTimeGrayscale(0);
 
-	clock_t start, stop;
-	start = clock();
+	std::chrono::steady_clock::time_point st_time;
+	std::chrono::steady_clock::time_point en_time;
+	double interval, frame_rate;
+	st_time = std::chrono::steady_clock::now();
 	for (int i = 0; i < n_frames; i ++)
 	{
 		status = camera->getDistanceAmplitude(tofImage);
@@ -110,10 +116,10 @@ void test_distance_amplitude(Camera* camera, int n_frames)
 			break;
 		}
 	}
-	stop = clock();
-	double interval = (double)(stop - start) / CLOCKS_PER_SEC;
-	double frame_rate = ((double) n_frames) / interval;
-	std::cout << "Distance amplitude frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
+	en_time = std::chrono::steady_clock::now();
+	interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
+	frame_rate = ((double) n_frames) / interval;
+	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 }
 
 void test()

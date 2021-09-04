@@ -1,6 +1,7 @@
 #include <iostream>
 #include <time.h>
 #include <thread>
+#include <chrono>
 
 #include <opencv2/highgui.hpp>
 
@@ -124,11 +125,11 @@ int main() {
 	std::cout << "amplitude0: " << amplitude0 << std::endl;
 	std::cout << "amplitude1: " << amplitude1 << std::endl;
 
-	camera->setIntegrationTimeGrayscale(6000);
+	camera->setIntegrationTimeGrayscale(0);
 
 	camera->setRange(50, 7500);
 
-	HDR_e hdr = HDR_TEMPORAL; // HDR_OFF;//
+	HDR_e hdr = HDR_OFF; //HDR_SPATIAL; //HDR_TEMPORAL; // HDR_OFF;//
 	status = camera->setHdr(hdr);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set HDR failed." << endl;
 	std::cout << "\nHDR: " << hdr << std::endl;
@@ -139,14 +140,15 @@ int main() {
 	std::thread th_points_cloud_visualize(&points_cloud_visualize);
 	th_points_cloud_visualize.detach();
 
-	clock_t start, stop;
+	std::chrono::steady_clock::time_point st_time;
+	std::chrono::steady_clock::time_point en_time;
+	double interval, frame_rate;
 	int n_frames = 0;
-	start = clock();
+	st_time = std::chrono::steady_clock::now();
+
 	while (!is_stopped)
 	{
-		//std::cout << "1 =======" << std::endl;
-		status = camera->getDistanceGrayscale(*tofImage);
-		//std::cout << "2 =======" << std::endl;
+		status = camera->getDistance(*tofImage);
 		if (status != ERROR_NUMMBER_NO_ERROR)
 		{
 			is_stopped = true;
@@ -169,9 +171,9 @@ int main() {
 
 		n_frames ++;
 	}
-	stop = clock();
-	double interval = (double)(stop - start) / CLOCKS_PER_SEC;
-	double frame_rate = ((double) n_frames) / interval;
+	en_time = std::chrono::steady_clock::now();
+	interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
+	frame_rate = ((double) n_frames) / interval;
 	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 
 	delete tofImage;

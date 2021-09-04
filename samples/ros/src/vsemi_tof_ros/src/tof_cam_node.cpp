@@ -2,6 +2,7 @@
 #include <time.h>
 #include <string>
 #include <thread>
+#include <chrono>
 
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
@@ -301,20 +302,25 @@ void require_tof_image() {
 
 	tofImage = new ToFImage(camera->getWidth(), camera->getHeight());
 
-	clock_t start, stop;
-	int n_frames = 0;
+	std::chrono::steady_clock::time_point st_time;
+	std::chrono::steady_clock::time_point en_time;
 	double interval, frame_rate;
-	start = clock();
+	int n_frames = 0;
+	st_time = std::chrono::steady_clock::now();
+
 	while (running) {
 		if (settings.updateParam) 
 		{
-			stop = clock();
-			interval = (double)(stop - start) / CLOCKS_PER_SEC;
-			frame_rate = ((double) n_frames) / interval;
-			std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
+			if (n_frames > 0)
+			{
+				en_time = std::chrono::steady_clock::now();
+				interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
+				frame_rate = ((double) n_frames) / interval;
+				std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
+			}
 
 			updateCamera(camera);
-			start = clock();
+			st_time = std::chrono::steady_clock::now();
 			n_frames = 0;
 		} else
 		{
@@ -331,8 +337,8 @@ void require_tof_image() {
 			n_frames ++;
 		}
 	}
-	stop = clock();
-	interval = (double)(stop - start) / CLOCKS_PER_SEC;
+	en_time = std::chrono::steady_clock::now();
+	interval = ((double) std::chrono::duration_cast<std::chrono::microseconds>(en_time - st_time).count()) / 1000000.0;
 	frame_rate = ((double) n_frames) / interval;
 	std::cout << "Distance frames: " << n_frames << " time spent: " << interval << " frame rate: " << frame_rate << std::endl;
 

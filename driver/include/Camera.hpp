@@ -65,6 +65,9 @@ public:
 
 	virtual void setRange(int start, int stop) = 0;
 
+	uint16_t getChipId();
+	uint16_t getWaferId();
+	uint32_t getID();
 	int getWidth();
 	int getHeight();
 	virtual void setFoV(double angle_x, double angle_y) = 0;
@@ -74,8 +77,12 @@ protected:
 	double _angle_y;
 
 	void setWidth(int width, int height);
+	void setID(uint16_t chipId, uint16_t waferId);
 
 private:
+	uint16_t _chipId;
+	uint16_t _waferId;
+
 	int _width;
 	int _height;
 };

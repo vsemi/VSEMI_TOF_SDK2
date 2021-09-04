@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="ns" default="vsemi_tof_ros"/>
+  <arg name="nn" default="camera"/>
+  <arg name="respawn" default="false"/>
+
+  <group ns="$(arg ns)">
+    <node pkg="vsemi_tof_ros"
+          type="tof_cam_node"
+          name="$(arg nn)"
+          output="screen"
+          respawn="$(arg respawn)">
+
+    </node>
+
+    <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"> </node>
+    <node name="base_link" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 map sensor_frame 1" />
+    <node name="rviz" pkg="rviz" type="rviz" args= "-d $(find vsemi_tof_ros)/rviz/config_vsemi_tof_ros.rviz" > </node>
+
+  </group>
+</launch>

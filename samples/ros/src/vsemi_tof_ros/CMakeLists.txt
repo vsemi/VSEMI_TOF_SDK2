@@ -5,7 +5,7 @@ EXECUTE_PROCESS( COMMAND uname -m COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTUR
 
 message( STATUS "Architecture: ${ARCHITECTURE}" )
 
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
     camera_info_manager
