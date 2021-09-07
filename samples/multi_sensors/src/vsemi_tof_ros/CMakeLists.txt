@@ -8,7 +8,6 @@ message( STATUS "Architecture: ${ARCHITECTURE}" )
 add_compile_options(-std=c++14)
 
 find_package(catkin REQUIRED COMPONENTS
-    camera_info_manager
     dynamic_reconfigure
     roscpp
     sensor_msgs
