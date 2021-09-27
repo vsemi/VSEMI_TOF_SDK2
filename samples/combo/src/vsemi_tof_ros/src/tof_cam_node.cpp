@@ -352,7 +352,6 @@ void start() {
 			std::cout << "Camera connected at port " << port << ": " << id << std::endl;
 			channels[id] = channel;
 
-			//cloud_publishers[id] = nh.advertise<sensor_msgs::PointCloud2>("cloud_" + std::to_string(i), 1);
 			cloud_publishers[i] = nh.advertise<sensor_msgs::PointCloud2>("cloud_" + std::to_string(i), 1);
 		}
 		i ++;
@@ -426,7 +425,7 @@ void start() {
 			{
 				if (chn != chn_central)
 				{
-					int i = chn - chn_central;
+					int i = chn_central - chn;
 
 					Eigen::Matrix3f rotation_matrix3f;
 					rotation_matrix3f = 
@@ -438,8 +437,7 @@ void start() {
 					transform_affine3f.rotate(rotation_matrix3f);
 					pcl::transformPointCloud (*channel->_cloud, *channel->_cloud, transform_affine3f);
 				}
-				//publish_cloud(cloud_publishers[id], channel->_cloud, curTime);
-				publish_cloud(cloud_publishers[channels.size() - chn - 1], channel->_cloud, curTime);
+				publish_cloud(cloud_publishers[chn], channel->_cloud, curTime);
 
 				if (chn == 0)
 				{
@@ -447,9 +445,9 @@ void start() {
 					grayscale = channel->grayscale;
 					amplitude = channel->amplitude;
 				} else{
-					cv::hconcat(channel->depth_bgr, depth_bgr, depth_bgr);
-					cv::hconcat(channel->grayscale, grayscale, grayscale);
-					cv::hconcat(channel->amplitude, amplitude, amplitude);
+					cv::hconcat(depth_bgr, channel->depth_bgr, depth_bgr);
+					cv::hconcat(grayscale, channel->grayscale, grayscale);
+					cv::hconcat(amplitude, channel->amplitude, amplitude);
 				}
 			} else{
 				break;

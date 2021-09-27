@@ -352,7 +352,7 @@ void start() {
 			std::cout << "Camera connected at port " << port << ": " << id << std::endl;
 			channels[id] = channel;
 
-			cloud_publishers[id] = nh.advertise<sensor_msgs::PointCloud2>("cloud_" + std::to_string(i), 1);
+			cloud_publishers[i] = nh.advertise<sensor_msgs::PointCloud2>("cloud_" + std::to_string(i), 1);
 		}
 		i ++;
 	}
@@ -374,6 +374,14 @@ void start() {
 
 	int n_frames = 0;
 	std::vector<std::thread> threads;
+
+	int chn_no = 0;
+	for(std::map<uint32_t,Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		uint32_t id = it->first;
+		std::cout << "Channel: " << chn_no << " Camera ID: " << id << std::endl;
+		chn_no ++;
+	}
 
 	st_time = std::chrono::steady_clock::now();
 	while (running) {
@@ -423,7 +431,7 @@ void start() {
 			Channel* channel = it->second;
 			if (channel->frame_ready)
 			{
-				publish_cloud(cloud_publishers[id], channel->_cloud, curTime);
+				publish_cloud(cloud_publishers[chn], channel->_cloud, curTime);
 
 				if (chn == 0)
 				{
@@ -431,9 +439,9 @@ void start() {
 					grayscale = channel->grayscale;
 					amplitude = channel->amplitude;
 				} else{
-					cv::hconcat(channel->depth_bgr, depth_bgr, depth_bgr);
-					cv::hconcat(channel->grayscale, grayscale, grayscale);
-					cv::hconcat(channel->amplitude, amplitude, amplitude);
+					cv::hconcat(depth_bgr, channel->depth_bgr, depth_bgr);
+					cv::hconcat(grayscale, channel->grayscale, grayscale);
+					cv::hconcat(amplitude, channel->amplitude, amplitude);
 				}
 			} else{
 				break;
