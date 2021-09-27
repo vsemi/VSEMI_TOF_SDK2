@@ -227,7 +227,7 @@ void process_scene(pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene, cv::Mat depth_b
 	std::vector<int> scene_indices;
 	pcl::removeNaNFromPointCloud(*scene, *scene_clean, scene_indices);
 
-	if ((! scene_clean->empty()) && scene_clean->points.size() > 0) {
+	//if ((! scene_clean->empty()) && scene_clean->points.size() > 0) {
 		publish_cloud(cloud_scene_publisher, scene_clean, curTime);
 
 		cvtColor(grayscale, grayscale, cv::COLOR_GRAY2BGR);
@@ -238,7 +238,7 @@ void process_scene(pcl::PointCloud<pcl::PointXYZRGB>::Ptr scene, cv::Mat depth_b
 		publish_image(image_grayscale_Publisher, grayscale, curTime);
 		publish_image(image_amplitude_Publisher, amplitude, curTime);
 
-	}
+	//}
 
 	process_busy = false;
 } 
