@@ -9,7 +9,7 @@ void read_camera_info(Camera* camera)
 
 	uint16_t chipId, waferId;
 	status = camera->getChipInformation(chipId, waferId);
-	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "\nID:" << waferId << "-" << chipId << "\n   Wafer:   " << waferId << "\n   Chip:    " << chipId << std::endl;
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "\nID:" << camera->getID() << "\n   Wafer:   " << waferId << "\n   Chip:    " << chipId << std::endl;
 	else std::cerr << "Error: " << status << std::endl;
 
 	unsigned int device, version;
