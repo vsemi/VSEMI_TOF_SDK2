@@ -283,8 +283,8 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 
 	globle_settings.range   = 7500;//static_cast<uint>(config.range);
 
-	globle_settings.angle_x = 55.0;//config.angle_x;
-	globle_settings.angle_y = 20.625;//config.angle_y;
+	globle_settings.angle_x = config.angle_x;
+	globle_settings.angle_y = config.angle_y;
 
 	globle_settings.updateParam = true;
 }
