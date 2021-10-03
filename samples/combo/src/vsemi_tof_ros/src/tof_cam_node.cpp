@@ -259,12 +259,12 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 {
 	globle_settings.image_type = static_cast<uint>(config.image_type);
 
-	globle_settings.hdr = 0;//static_cast<uint>(config.hdr);
+	globle_settings.hdr = static_cast<uint>(config.hdr);
 
 	globle_settings.automaticIntegrationTime = 0;//config.automatic_integration_time;
 
 	globle_settings.integrationTimeATOF0  = static_cast<uint>(config.integration_time_0);
-	globle_settings.integrationTimeATOF1  = 0;//static_cast<uint>(config.integration_time_1);
+	globle_settings.integrationTimeATOF1  = static_cast<uint>(config.integration_time_1);
 	globle_settings.integrationTimeATOF2  = 0;//static_cast<uint>(config.integration_time_2);
 	globle_settings.integrationTimeATOF3  = 0;//static_cast<uint>(config.integration_time_3);
 	globle_settings.integrationTimeBTOF4  = 0;//static_cast<uint>(config.integration_time_4);
@@ -273,7 +273,7 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 	globle_settings.integrationTimeGray   = 0;//static_cast<uint>(config.integration_time_gray);
 
 	globle_settings.minAmplitude0 = static_cast<uint>(config.min_amplitude_0);
-	globle_settings.minAmplitude1 = 0;//static_cast<uint>(config.min_amplitude_1);
+	globle_settings.minAmplitude1 = static_cast<uint>(config.min_amplitude_1);
 	globle_settings.minAmplitude2 = 0;//static_cast<uint>(config.min_amplitude_2);
 	globle_settings.minAmplitude3 = 0;//static_cast<uint>(config.min_amplitude_3);
 	globle_settings.minAmplitude4 = 0;//static_cast<uint>(config.min_amplitude_4);

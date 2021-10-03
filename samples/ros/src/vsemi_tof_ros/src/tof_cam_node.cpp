@@ -52,6 +52,10 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 	settings.integrationTimeBTOF5  = static_cast<uint>(config.integration_time_5);
 
 	settings.integrationTimeGray   = static_cast<uint>(config.integration_time_gray);
+	if (settings.image_type != 1)
+	{
+		settings.integrationTimeGray   = 0;
+	}
 
 	settings.minAmplitude0 = static_cast<uint>(config.min_amplitude_0);
 	settings.minAmplitude1 = static_cast<uint>(config.min_amplitude_1);
@@ -282,8 +286,40 @@ void require_tof_image() {
 		std::cerr << "Failed opening Camera!" << std::endl;
 		return;
 	}
+	std::cout << "Camera ID: " << camera->getID() << std::endl;
 
 	ErrorNumber_e status;
+
+	unsigned int device, version;
+	status = camera->getIdentification(device, version);
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Identification:\n   device:  " << device << "\n   version: " << version << std::endl;
+	else std::cerr << "Error: " << status << std::endl;
+
+	unsigned int major, minor;
+	status = camera->getFirmwareRelease(major, minor);
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Firmware:\n   major:   " << major << "\n   minor:   " << minor << std::endl;
+	else std::cerr << "Error: " << status << std::endl;
+
+	int16_t temperature;
+	status = camera->getTemperature(temperature);
+	if (status == ERROR_NUMMBER_NO_ERROR) std::cout << "Temperature         :   " << temperature << std::endl;
+	else std::cerr << "Error: " << status << std::endl;
+
+	CameraInfo cameraInfo;
+	status = camera->getLensCalibrationData(cameraInfo);
+	if (status == ERROR_NUMMBER_NO_ERROR)
+	{
+		std::cout << "Camera distortion coefficient vector: " << std::endl;
+		for(int i = 0; i < 8; i++) {
+			std::cout << cameraInfo.D[i] << " ";
+		}
+		std::cout << std::endl;
+		std::cout << "Camera intrinsic matrix: " << std::endl;
+		for(int i = 0; i < 9; i++) {
+			std::cout << cameraInfo.K[i] << " ";
+		}
+		std::cout << std::endl;
+	} else std::cerr << "Error: " << status << std::endl;
 
 	status = camera->setOperationMode(MODE_BEAM_A);
 	if (status != ERROR_NUMMBER_NO_ERROR) cerr << "Set Mode failed." << endl;
@@ -324,6 +360,7 @@ void require_tof_image() {
 			n_frames = 0;
 		} else
 		{
+			//std::cerr << "Debug: accuquire a frame ..." << std::endl;
 			if (settings.image_type == 0) status = camera->getDistance(*tofImage);
 			if (settings.image_type == 1) status = camera->getDistanceGrayscale(*tofImage);
 			if (settings.image_type == 2) status = camera->getDistanceAmplitude(*tofImage);
