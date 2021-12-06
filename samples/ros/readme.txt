@@ -48,7 +48,6 @@ Build and run sample application:
 
 5. To stop ROS, please press Ctr + C in terminal 
 
-
 6. Settings:
 
   If the FoV of your sensor is not default FoV (For example, Onion Tau camera), makre sure change the value of angle_x and angle_y to the actual FoV of your sensor.
