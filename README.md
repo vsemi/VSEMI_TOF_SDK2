@@ -35,7 +35,7 @@ Point cloud with grayscale:
 
 ## FoV Settings:
 
-  If the FoV of your sensor is not default FoV (For example, Onion Tau camera), makre sure change the value of angle_x and angle_y to the actual FoV of your sensor.
+  If the FoV of your sensor is not default FoV (For example, for Onion Tau camera, it is 80 x 30), makre sure change the value of angle_x and angle_y to the actual FoV of your sensor.
   
   You may set FoV from the configuration panel in ROS sample application,
   ![FoV config](samples/ros/screenshot_config.png)
