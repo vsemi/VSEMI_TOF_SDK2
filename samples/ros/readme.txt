@@ -51,9 +51,9 @@ Build and run sample application:
 
 6. Settings:
 
-  If the FoV of your sensor is not default FoV (55x21), makre sure change the value of angle_x and angle_y, from the configuration panel:
-
-![Config](screenshot_config.png)
+  If the FoV of your sensor is not default FoV (For example, Onion Tau camera), makre sure change the value of angle_x and angle_y to the actual FoV of your sensor.
+  
+  You may set FoV from the configuration panel in ROS sample application,
 
   Or set FoV in source code by calling a method in Camera instance: setFoV(double angle_x, double angle_y)
   
