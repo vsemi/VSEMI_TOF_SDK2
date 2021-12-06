@@ -48,3 +48,12 @@ Build and run sample application:
 
 5. To stop ROS, please press Ctr + C in terminal 
 
+
+6. Settings:
+
+  If the FoV of your sensor is not default FoV (55x21), makre sure change the value of angle_x and angle_y, from the configuration panel:
+
+![Config](screenshot_config.png)
+
+  Or set FoV in source code by calling a method in Camera instance: setFoV(double angle_x, double angle_y)
+  
