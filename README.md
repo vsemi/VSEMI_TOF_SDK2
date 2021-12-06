@@ -33,6 +33,15 @@ Depth Map:
 Point cloud with grayscale:
 ![Image of ROS](samples/ros/screenshot.png)
 
+## FoV Settings:
+
+  If the FoV of your sensor is not default FoV (For example, Onion Tau camera), makre sure change the value of angle_x and angle_y to the actual FoV of your sensor.
+  
+  You may set FoV from the configuration panel in ROS sample application,
+  ![FoV config](samples/ros/screenshot_config.png)
+
+  Or set FoV in source code by calling a method in Camera instance: setFoV(double angle_x, double angle_y)
+
 ## Developing you own application
 
  - **Driver**: copy the **include** files and **binary library** file into appropriate folder in your application development environment;
