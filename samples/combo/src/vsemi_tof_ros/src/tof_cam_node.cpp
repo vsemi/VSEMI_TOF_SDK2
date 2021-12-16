@@ -30,6 +30,7 @@ std::map<uint32_t, ros::Publisher> cloud_publishers;
 static ros::Publisher image_depth_Publisher;
 static ros::Publisher image_grayscale_Publisher;
 static ros::Publisher image_amplitude_Publisher;
+static ros::Publisher merged_cloud_publisher;
 
 static std::string strFrameID = "sensor_frame"; 
 
@@ -37,6 +38,8 @@ static Settings globle_settings;
 
 bool running = true;
 static bool process_busy = false;
+
+float angle_x_between_sensors;
 
 class Channel
 {
@@ -209,6 +212,8 @@ public:
 		std::cout << "angle_x: " << _settings->angle_x << std::endl;
 		std::cout << "angle_y: " << _settings->angle_y << std::endl;
 
+		std::cout << "angle_x_between_sensors: " << angle_x_between_sensors << std::endl;
+
 		_camera->setDcsFilter(_settings->dcsFilter);
 	}
 
@@ -261,30 +266,32 @@ void updateConfig(vsemi_tof_ros::vsemi_tof_rosConfig &config, uint32_t level)
 
 	globle_settings.hdr = static_cast<uint>(config.hdr);
 
-	globle_settings.automaticIntegrationTime = 0;//config.automatic_integration_time;
+	globle_settings.automaticIntegrationTime = 0;
 
 	globle_settings.integrationTimeATOF0  = static_cast<uint>(config.integration_time_0);
 	globle_settings.integrationTimeATOF1  = static_cast<uint>(config.integration_time_1);
-	globle_settings.integrationTimeATOF2  = 0;//static_cast<uint>(config.integration_time_2);
-	globle_settings.integrationTimeATOF3  = 0;//static_cast<uint>(config.integration_time_3);
-	globle_settings.integrationTimeBTOF4  = 0;//static_cast<uint>(config.integration_time_4);
-	globle_settings.integrationTimeBTOF5  = 0;//static_cast<uint>(config.integration_time_5);
+	globle_settings.integrationTimeATOF2  = 0;
+	globle_settings.integrationTimeATOF3  = 0;
+	globle_settings.integrationTimeBTOF4  = 0;
+	globle_settings.integrationTimeBTOF5  = 0;
 
-	globle_settings.integrationTimeGray   = 0;//static_cast<uint>(config.integration_time_gray);
+	globle_settings.integrationTimeGray   = 0;
 
 	globle_settings.minAmplitude0 = static_cast<uint>(config.min_amplitude_0);
 	globle_settings.minAmplitude1 = static_cast<uint>(config.min_amplitude_1);
-	globle_settings.minAmplitude2 = 0;//static_cast<uint>(config.min_amplitude_2);
-	globle_settings.minAmplitude3 = 0;//static_cast<uint>(config.min_amplitude_3);
-	globle_settings.minAmplitude4 = 0;//static_cast<uint>(config.min_amplitude_4);
-	globle_settings.minAmplitude5 = 0;//static_cast<uint>(config.min_amplitude_5);
+	globle_settings.minAmplitude2 = 0;
+	globle_settings.minAmplitude3 = 0;
+	globle_settings.minAmplitude4 = 0;
+	globle_settings.minAmplitude5 = 0;
 
-	globle_settings.dcsFilter = 0;//config.dcs_filter;
+	globle_settings.dcsFilter = 0;
 
-	globle_settings.range   = 7500;//static_cast<uint>(config.range);
+	globle_settings.range   = 5500;
 
-	globle_settings.angle_x = config.angle_x;
-	globle_settings.angle_y = config.angle_y;
+	globle_settings.angle_x = 50.0;
+	globle_settings.angle_y = 18.75;
+
+	angle_x_between_sensors = config.angle_x_between_sensors;
 
 	globle_settings.updateParam = true;
 }
@@ -341,7 +348,7 @@ void start() {
 
 	bool succeed = false;
 	int i = 0;
-	while(i < 6 && channels.size() < 3)
+	while(i < 6 && channels.size() < 4)
 	{
 		std::string port = "/dev/ttyACM" + std::to_string(i);
 		Channel* channel = new Channel(port, &globle_settings);
@@ -366,6 +373,7 @@ void start() {
 	image_depth_Publisher     = nh.advertise<sensor_msgs::Image>("image_depth", 1);
 	image_grayscale_Publisher = nh.advertise<sensor_msgs::Image>("image_grayscale", 1);
 	image_amplitude_Publisher = nh.advertise<sensor_msgs::Image>("image_amplitude", 1);
+	merged_cloud_publisher = nh.advertise<sensor_msgs::PointCloud2>("cloud_merged", 1);
 
 	std::chrono::steady_clock::time_point st_time;
 	std::chrono::steady_clock::time_point en_time;
@@ -414,29 +422,37 @@ void start() {
 		cv::Mat depth_bgr;
 		cv::Mat grayscale;
 		cv::Mat amplitude;
+		int n_channels = channels.size();
+		bool even_sensors = (n_channels % 2 == 0);
 		int chn = 0;
-		int chn_central = 0.5 * channels.size();
+		int chn_central = 0.5 * n_channels;
 		ros::Time curTime = ros::Time::now();
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_merged(new pcl::PointCloud<pcl::PointXYZRGB>);
 		for(std::map<uint32_t,Channel*>::iterator it = channels.begin(); it != channels.end(); ++it)
 		{
 			uint32_t id = it->first;
 			Channel* channel = it->second;
 			if (channel->frame_ready)
 			{
-				if (chn != chn_central)
+				if (even_sensors || chn != chn_central)
 				{
-					int i = chn_central - chn;
+					float f = chn_central - chn;
+					if (even_sensors)
+					{
+						f -= 0.5;
+					}
 
 					Eigen::Matrix3f rotation_matrix3f;
 					rotation_matrix3f = 
 						  Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())
-						* Eigen::AngleAxisf(M_PI * i * globle_settings.angle_x / 180.0, Eigen::Vector3f::UnitY())
+						* Eigen::AngleAxisf(M_PI * f * angle_x_between_sensors / 180.0, Eigen::Vector3f::UnitY())
 						* Eigen::AngleAxisf(0, Eigen::Vector3f::UnitZ());
 					
 					Eigen::Affine3f transform_affine3f = Eigen::Affine3f::Identity();
 					transform_affine3f.rotate(rotation_matrix3f);
 					pcl::transformPointCloud (*channel->_cloud, *channel->_cloud, transform_affine3f);
 				}
+				*cloud_merged += *(channel->_cloud);
 				publish_cloud(cloud_publishers[chn], channel->_cloud, curTime);
 
 				if (chn == 0)
@@ -461,6 +477,7 @@ void start() {
 		publish_image(image_depth_Publisher, depth_bgr, curTime);
 		publish_image(image_grayscale_Publisher, grayscale, curTime);
 		publish_image(image_amplitude_Publisher, amplitude, curTime);
+		publish_cloud(merged_cloud_publisher, cloud_merged, curTime);
 
 		n_frames ++;
 	}
